@@ -2,3 +2,6 @@
 
 postfix_smtpd_public: false
 postfix_server: false
+postfix_patchwork_enabled: false
+patchwork_user: "patchwork"
+patchwork_mail_handler: "/srv/http/patchwork/parsemail.sh"
