@@ -1,0 +1,114 @@
+---
+- name: Prepare container
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Remove btrfs subvolumes
+      become: true
+      command: btrfs subvolume delete {{playbook_dir}}/tmp/nspawn/{{item}}
+      ignore_errors: true
+      with_items:
+        - nspawn1
+
+    - name: Remove nspawn directory
+      become: true
+      file: path="{{playbook_dir}}/tmp/nspawn/" state=absent
+
+    - block:
+      - name: Fetch bootstrap tarball
+        become: true
+        get_url:
+          url: "{{iso_mirror}}/iso/latest/{{item}}"
+          dest: "{{playbook_dir}}/tmp/{{item}}"
+        with_items:
+          - "{{tarball_name}}"
+          - "{{tarball_name}}.sig"
+
+      - name: Verify bootstrap signature
+        become: true
+        command: pacman-key --verify {{tarball_name}}.sig
+
+      - name: Create bootstrap directory
+        become: true
+        file: path={{bootstrap_basedir}} state=directory
+
+      - name: Extract bootstrap tarball
+        become: true
+        unarchive:
+          src: "{{playbook_dir}}/tmp/{{tarball_name}}"
+          dest: "{{bootstrap_basedir}}"
+          remote_src: true
+
+      - name: Set up pacman keyring
+        become: true
+        command: arch-chroot {{bootstrap_dir}} pacman-key --init
+
+      - name: Populate pacman-key
+        become: true
+        command: arch-chroot {{bootstrap_dir}} pacman-key --populate archlinux
+
+      - name: Set pacman mirror
+        become: true
+        lineinfile: dest={{bootstrap_dir}}/etc/pacman.d/mirrorlist line="Server = {{pacman_mirror}}/$repo/os/$arch"
+
+      - name: Install required packages
+        become: true
+        command: arch-chroot {{bootstrap_dir}} pacman -Syu --noconfirm --noprogressbar --quiet python2 openssh less systemd-sysvcompat sed
+
+      - name: Enable ssh service
+        become: true
+        command: arch-chroot {{bootstrap_dir}} systemctl enable sshd systemd-networkd systemd-resolved
+
+      - set_fact: pubkey_list="{{ lookup('file', 'pubkeys/' + item) }}"
+        register: pubkeys
+        with_items: "{{ root_ssh_keys }}"
+
+      - set_fact: pubkey_string={{ pubkeys.results | map(attribute='ansible_facts.pubkey_list') | join('\n') }}
+
+      - name: Create root's ssh config dir
+        become: true
+        file: path={{bootstrap_dir}}/root/.ssh owner=root group=root mode=0700 state=directory
+
+      - name: add authorized key for root
+        become: true
+        authorized_key: user=root key="{{ pubkey_string }}" path={{bootstrap_dir}}/root/.ssh/authorized_keys exclusive=yes
+
+      - name: configure sshd
+        become: true
+        template: src=roles/install_arch/templates/sshd_config.j2 dest={{bootstrap_dir}}/etc/ssh/sshd_config owner=root group=root mode=0644
+
+      - name: create symlink to resolv.conf
+        become: true
+        file: src=/run/systemd/resolve/resolv.conf dest={{bootstrap_dir}}/etc/resolv.conf state=link force=yes
+
+      - name: Start nspawn container
+        become: true
+        command: systemd-run -q systemd-nspawn --quiet --boot --network-veth -U --settings=override --machine={{item}} -D {{playbook_dir}}/tmp/nspawn/{{item}} --template {{bootstrap_dir}}
+        with_items:
+          - nspawn1
+        tags:
+          - start_containers
+
+      - name: Add hosts
+        add_host:
+          name: "{{item}}"
+          groups: nspawn-containers
+        with_items:
+           - nspawn1
+        tags:
+          - test_deployment
+
+      vars:
+        tarball_name: archlinux-bootstrap-2017.02.01-x86_64.tar.gz
+        bootstrap_basedir: "{{playbook_dir}}/tmp/nspawn/archlinux-bootstrap"
+        bootstrap_dir: "{{playbook_dir}}/tmp/nspawn/archlinux-bootstrap/root.x86_64"
+        pacman_mirror: "https://mirror.pseudoform.org/"
+        iso_mirror: "https://mirror.pseudoform.org/"
+
+- name: Test deployment
+  hosts: nspawn1
+  roles:
+    # put roles to test here
+    - { role: postfix, postfix_server: false, postfix_smtpd_public: true, postfix_patchwork_enabled: true, tags: ["mail", "postfix"] }
+  tags:
+    - test_deployment
