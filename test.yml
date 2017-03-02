@@ -99,7 +99,7 @@
           - test_deployment
 
       vars:
-        tarball_name: archlinux-bootstrap-2017.02.01-x86_64.tar.gz
+        tarball_name: archlinux-bootstrap-2017.03.01-x86_64.tar.gz
         bootstrap_basedir: "{{playbook_dir}}/tmp/nspawn/archlinux-bootstrap"
         bootstrap_dir: "{{playbook_dir}}/tmp/nspawn/archlinux-bootstrap/root.x86_64"
         pacman_mirror: "https://mirror.pseudoform.org/"
