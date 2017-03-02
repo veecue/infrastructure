@@ -26,7 +26,7 @@
 
       - name: Verify bootstrap signature
         become: true
-        command: pacman-key --verify {{tarball_name}}.sig
+        command: pacman-key --verify {{playbook_dir}}/tmp/{{tarball_name}}.sig
 
       - name: Create bootstrap directory
         become: true
