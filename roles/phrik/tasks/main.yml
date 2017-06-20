@@ -1,0 +1,11 @@
+---
+
+- name: add phrik group
+  group: name=phrik gid=1100 state=present
+
+- name: add phrik user
+  user: name=phrik group=phrik comment="phrik IRC bot" createhome=yes shell="/bin/false"
+
+- name: ading users to phrik group
+  user: groups=phrik name="{{ item }}" append=yes
+  with_items: "{{ phrik_group_users }}"

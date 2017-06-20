@@ -141,6 +141,7 @@ arch_users:
     ssh_key: demize.pub
     groups:
       - tu
+      - phrik
   djgera:
     name: "Gerardo Exequiel Pozzi"
     ssh_key: djgera.pub
@@ -423,3 +424,6 @@ arch_users:
     ssh_key: zorun.pub
     groups:
       - tu
+
+phrik_group_users:
+  - demize
