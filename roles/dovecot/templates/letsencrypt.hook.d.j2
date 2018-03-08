@@ -1,5 +1,9 @@
 #!/bin/sh
 
+#
+# {{ ansible_managed }}
+#
+
 test "$1" = renew || exit 0
 
 check_domain="{{ mail_domain }}"

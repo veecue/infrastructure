@@ -1,3 +1,7 @@
+#
+# {{ ansible_managed }}
+#
+
 #jinja2: lstrip_blocks: True
 {% for user in root_ssh_keys | sort -%}
 	{{ lookup('file', '../pubkeys/' + user) }}

@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+#
+# {{ ansible_managed }}
+#
+
 use strict;
 use warnings;
 use DBI;

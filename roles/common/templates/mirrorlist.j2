@@ -1,3 +1,6 @@
+#
+# {{ ansible_managed }}
+#
 {% if 'mirrors' in group_names %}
 Server = file:///srv/ftp/$repo/os/$arch
 {% endif %}

@@ -1,3 +1,6 @@
 #!/bin/bash
+#
+# {{ ansible_managed }}
+#
 
 BORG_REPO="{{ backup_host }}:{{ backup_dir }}" exec /usr/bin/borg "$@"

@@ -1,4 +1,7 @@
 #jinja2: lstrip_blocks: True
+#
+# {{ ansible_managed }}
+#
 {% for user in arch_users | sort %}
     {% for group in pubkey_groups | sort %}
         {% if group in arch_users[user].groups %}
