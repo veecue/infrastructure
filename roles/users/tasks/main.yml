@@ -5,3 +5,14 @@
     state: absent
     path: "{{  playbook_dir }}/../pubkeys/{{ username }}.pub"
   delegate_to: localhost
+
+- name: remove home directory
+  file:
+    state: absent
+    path: "/home/{{ username }}"
+
+- name: remove user from server
+  user:
+    name: "{{ username }}"
+    state: absent
+    remove: yes
