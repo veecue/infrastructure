@@ -1,0 +1,7 @@
+---
+
+- name: remove pubkey
+  file:
+    state: absent
+    path: "{{  playbook_dir }}/../pubkeys/{{ username }}.pub"
+  delegate_to: localhost

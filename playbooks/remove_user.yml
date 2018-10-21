@@ -1,0 +1,10 @@
+---
+
+- name: remove user from infrastructure
+  hosts: all
+  remote_user: root
+  vars_prompt:
+    - name: "username"
+      prompt: "which user should be removed?"
+  roles:
+    - { role: users }
