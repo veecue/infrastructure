@@ -72,11 +72,17 @@ The following steps should be used to update our managed servers:
 #### Services
 - build server (pkgbuild.com)
 - releng
-- torrent tracker
 - sogrep
 - /~user/ webhost
+- torrent tracker
+
+### vps
+
+#### Services
 - irc bot (phrik)
 - quassel core
+
+1 vCPU, 2GB ram, 20 GB diskspace
 
 
 ### nymeria
