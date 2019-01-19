@@ -7,6 +7,8 @@ server {
     error_log    /var/log/nginx/{{ planet_domain }}/error.log;
 
     include snippets/letsencrypt.conf;
+    include snippets/headers.conf;
+    include snippets/planet_headers.conf;
 
     location / {
         access_log off;
@@ -18,6 +20,9 @@ server {
     listen       443 ssl http2;
     listen       [::]:443 ssl http2;
     server_name  {{ planet_domain }};
+
+    include snippets/headers.conf;
+    include snippets/planet_headers.conf;
 
     access_log   /var/log/nginx/{{ planet_domain }}/access.log reduced;
     error_log    /var/log/nginx/{{ planet_domain }}/error.log;

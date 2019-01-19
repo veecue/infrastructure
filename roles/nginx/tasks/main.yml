@@ -19,6 +19,7 @@
   with_items:
     - letsencrypt.conf
     - sslsettings.conf
+    - headers.conf
   notify:
     - reload nginx
 
