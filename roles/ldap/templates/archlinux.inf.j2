@@ -1,14 +1,14 @@
 [general]
 config_version = 2
-full_machine_name = {{ inventory_hostname}}
+full_machine_name = {{ inventory_hostname }}
 selinux = False
-start = False
+start = True
 strict_host_checking = True
 systemd = True
 
 [slapd]
 instance_name = archlinux
-root_dn = cn=Administrator
+root_dn = cn=Directory Manager
 root_password = {{ vault_ldap_dir_manager_password }}
 port = 389
 secure_port = 636
