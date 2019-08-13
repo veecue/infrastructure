@@ -1,26 +1,41 @@
 ---
 
+
 - name: install ldap
-  pacman: name=389-ds-base,python-lib389 state=present
+  pacman: name=389-ds-base state=present
 
 # - name: start dirsrv service
 #   service: name=dirsrv 
 
+- name: create template file
+  template: src=archlinux.inf.j2 dest=/etc/dirsrv/archlinux.inf owner=root group=root mode=0600
+
+- name: create archlinux instance
+  command: dscreate from-file /etc/dirsrv/archlinux.inf
+  args:
+    creates: /var/lib/dirsrv/slapd-archlinux
+
 - name: create parent entry categories
   ldap_entry:
-    dn: ou={{item}},dc=archlinux,dc=org
+    server_uri: "ldaps://ldap.archlinux.org"
+    bind_dn: cn=Directory Manager,dc=archlinux,dc=org
+    bind_pw: "{{ vault_ldap_dir_manager_password }}"
+    dn: "ou={{item}},dc=archlinux,dc=org"
     objectClass:
       - top
       - organizationalUnit
     attributes:
-      ou: {{item}}
+      ou: "{{item}}"
   with_items:
-    - users
+    - people
     - groups
 
 - name: create user entries
   ldap_entry:
-    dn: uid={{item.key}},ou=users,dc=archlinux,dc=org
+    server_uri: "ldaps://ldap.archlinux.org"
+    bind_dn: cn=Directory Manager,dc=archlinux,dc=org
+    bind_pw: "{{ vault_ldap_dir_manager_password }}"
+    dn: "uid={{item.key}},ou=people,dc=archlinux,dc=org"
     objectClass:
       - top
       - person
@@ -28,12 +43,15 @@
       - organizationalPerson
       - posixAccount
     attributes:
-      uid: {{item.key}}
-      givenName: {{item.value.name}}
+      uid: "{{item.key}}"
+      givenName: "{{item.value.name}}"
   with_dict: "{{ arch_users }}"
 
 - name: create group entries
   ldap_entry:
+    server_uri: "ldaps://ldap.archlinux.org"
+    bind_dn: cn=Directory Manager,dc=archlinux,dc=org
+    bind_pw: "{{ vault_ldap_dir_manager_password }}"
     dn: cn={{item}},ou=groups,dc=archlinux,dc=org
     objectClass:
       - top
@@ -53,7 +71,7 @@
   firewalld: port={{ item }} permanent=true state=enabled immediate=yes
   when: configure_firewall
   with_items:
-    - 389
-    - 636
+    - 389/tcp
+    - 636/tcp
   tags:
     - firewall
