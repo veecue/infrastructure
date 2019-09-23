@@ -7,6 +7,7 @@
       - git
       - python
       - python-sqlalchemy
+      - python-sqlalchemy-continuum
       - python-flask
       - python-flask-sqlalchemy
       - python-flask-wtf
@@ -27,7 +28,7 @@
   file: state=directory owner=security group=security path="{{ security_tracker_dir }}"
 
 - name: clone security-tracker repo
-  git: repo=https://github.com/archlinux/arch-security-tracker.git version="fa5acdf20f30b070fe388340b464dae58d30e23f" dest="{{ security_tracker_dir }}"
+  git: repo=https://github.com/archlinux/arch-security-tracker.git version="{{ security_tracker_version }}" dest="{{ security_tracker_dir }}"
   become: true
   become_user: security
   register: release
@@ -62,6 +63,12 @@
 
 - name: deploy security-tracker
   template: src=security-tracker.ini.j2 dest=/etc/uwsgi/vassals/security-tracker.ini owner=security group=http mode=0644
+
+- name: database upgrade
+  become: true
+  become_user: security
+  command: /usr/bin/make db-upgrade chdir="{{ security_tracker_dir }}"
+  when: release.changed
 
 - name: deploy new release
   become: true
