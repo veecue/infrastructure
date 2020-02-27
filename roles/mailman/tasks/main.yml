@@ -1,5 +1,8 @@
 ---
 
+- name: install mailman
+  pacman: name=mailman3,mailman3-hyperkitty,postorius,python-psycopg2,uwsgi,uwsgi-plugin-python,hyperkitty state=present
+
 - name: set up nginx
   template: src=nginx.d.conf.j2 dest=/etc/nginx/nginx.d/mailman.conf owner=root group=root mode=644
   notify:
@@ -13,3 +16,11 @@
   tags:
     - nginx
 
+- name: start and enable mailman core timer
+  service: name="mailman3.timer" enabled=yes state=started
+
+- name: start and enable mailman digests timer
+  service: name="mailman3-digests.timer" enabled=yes state=started
+
+- name: start and enable mailman notify timer
+  service: name="mailman3-notify.timer" enabled=yes state=started

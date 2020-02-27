@@ -159,7 +159,6 @@ The following steps should be used to update our managed servers:
 
 #### Services
 
-  - mailman
   - projects (projects.archlinux.org)
 
 ### apollo
@@ -213,6 +212,7 @@ The following steps should be used to update our managed servers:
 #### Services
   - ~/user/ webhost
 
+<<<<<<< HEAD
 ### accounts.archlinux.org
 
 This server is /special/. It runs keycloak and is central to our unified Arch Linux account management world.
@@ -257,6 +257,11 @@ Medium-fast-ish packet.net box with Debian on it. Is currently maintained manual
 
 #### Services
   - GitLab runner
+
+## mailman.archlinux.org
+
+#### Services:
+  - mailman
 
 ## Ansible repo workflows
 
