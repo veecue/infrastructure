@@ -1,0 +1,11 @@
+[mailman]
+layout: fhs
+
+[database]
+class: mailman.database.postgresql.PostgreSQLDatabase
+url: postgres://{{ mailman_db_user}}:{{ vault_postgres_users.mailman }}@localhost/mailman
+
+#[archiver.hyperkitty]
+#class: mailman_hyperkitty.Archiver
+#enable: yes
+#configuration: /etc/mailman-hyperkitty.cfg

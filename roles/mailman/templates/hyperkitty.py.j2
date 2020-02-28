@@ -1,0 +1,30 @@
+SECRET_KEY = '{{ }}'
+
+DEBUG = False
+TEMPLATE_DEBUG = DEBUG
+
+ADMINS = (
+     ('HyperKitty Admin', 'admin@archlinux.org'),
+)
+
+ALLOWED_HOSTS = [
+	"localhost",
+	"127.0.0,1",
+]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ""
+EMAIL_HOST_PASSWORD = ""
+
+DATABASES = {
+    'default': {
+          'ENGINE'  : 'django.db.backends.postgresql_psycopg2',
+          'NAME'    : 'hyperkitty',
+          'USER'    : '{{ }}',
+          'PASSWORD': ''{{ }},
+          'HOST'    : 'localhost',
+          'PORT'    : '',
+    }
+}

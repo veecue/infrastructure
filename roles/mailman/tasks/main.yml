@@ -3,21 +3,30 @@
 - name: install mailman
   pacman: name=mailman3,mailman3-hyperkitty,postorius,python-psycopg2,uwsgi,uwsgi-plugin-python,hyperkitty state=present
 
-- name: set up nginx
-  template: src=nginx.d.conf.j2 dest=/etc/nginx/nginx.d/mailman.conf owner=root group=root mode=644
-  notify:
-    - reload nginx
-  tags:
-    - nginx
+- name: add mailman postgres db
+  postgresql_db: db=mailman
+  become: yes
+  become_user: postgres
+  become_method: su
 
-- name: make nginx log dir
-  file: path=/var/log/nginx/{{ mailman_domain }} state=directory owner=root group=root mode=0755
-  when: archweb_site
-  tags:
-    - nginx
+- name: add mailman postgres user
+  postgresql_user: db=mailman name=mailman password={{ vault_postgres_users.mailman }} encrypted=true
+  become: yes
+  become_user: postgres
+  become_method: su
 
-- name: start and enable mailman core timer
-  service: name="mailman3.timer" enabled=yes state=started
+- template: src="mailman.cfg.j2" dest="/etc/mailman.cfg" owner=mailman group=root mode=0644
+
+- template: src="hyperkitty.py.j2" dest="/etc/webapps/hyperkitty/settings_local.py" owner=hyperkitty group=root mode=0644
+
+- name: generate a database
+  command: django-admin migrate --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
+  become: yes
+  become_user: hyperkity
+  become_method: su
+
+- name: start and enable mailman core service
+  service: name="mailman3.service" enabled=yes state=started
 
 - name: start and enable mailman digests timer
   service: name="mailman3-digests.timer" enabled=yes state=started
