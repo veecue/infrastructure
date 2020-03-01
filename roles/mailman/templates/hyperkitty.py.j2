@@ -22,8 +22,8 @@ DATABASES = {
     'default': {
           'ENGINE'  : 'django.db.backends.postgresql_psycopg2',
           'NAME'    : 'hyperkitty',
-          'USER'    : '{{ }}',
-          'PASSWORD': ''{{ }},
+          'USER'    : '{{ hyperkitty_db_user }}',
+          'PASSWORD': ''{{ vault_postgres_users.hyperkitty }},
           'HOST'    : 'localhost',
           'PORT'    : '',
     }
