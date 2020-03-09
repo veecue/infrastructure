@@ -17,13 +17,45 @@
 
 - template: src="mailman.cfg.j2" dest="/etc/mailman.cfg" owner=mailman group=root mode=0644
 
+- name: add hyperkitty postgres db
+  postgresql_db: db=hyperkitty
+  become: yes
+  become_user: postgres
+  become_method: su
+
+- name: add hyperkitty postgres user
+  postgresql_user: db=hyperkitty name={{ hyperkitty_db_user }} password={{ vault_postgres_users.hyperkitty }} encrypted=true
+  become: yes
+  become_user: postgres
+  become_method: su
+
 - template: src="hyperkitty.py.j2" dest="/etc/webapps/hyperkitty/settings_local.py" owner=hyperkitty group=root mode=0644
 
-- name: generate a database
+# TODO: only run when required, ie. hyperkitty package updated
+- name: generate a hyperkitty database
   command: django-admin migrate --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
   become: yes
-  become_user: hyperkity
-  become_method: su
+  become_user: hyperkitty
+  become_method: sudo
+
+- name: run collectstatic for hyperkitty
+  command: django-admin collectstatic --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
+  become: yes
+  become_user: hyperkitty
+  become_method: sudo
+
+- name: run compress for hyperkitty
+  command: django-admin compress --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
+  become: yes
+  become_user: hyperkitty
+  become_method: sudo
+
+# TODO: run only once
+- name: populate the hyperkitty database
+  command: django-admin loaddata --pythonpath /usr/share/webapps/hyperkitty/ --settings settings first_start
+  become: yes
+  become_user: hyperkitty
+  become_method: sudo
 
 - name: start and enable mailman core service
   service: name="mailman3.service" enabled=yes state=started
