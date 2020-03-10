@@ -33,29 +33,55 @@
 
 # TODO: only run when required, ie. hyperkitty package updated
 - name: generate a hyperkitty database
-  command: django-admin migrate --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
+  command: django-admin migrate --pythonpath {{ hyperkitty_dir }} --settings settings
   become: yes
   become_user: hyperkitty
   become_method: sudo
 
 - name: run collectstatic for hyperkitty
-  command: django-admin collectstatic --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
+  command: django-admin collectstatic --pythonpath {{ hyperkitty_dir }} --settings settings --noinput
   become: yes
   become_user: hyperkitty
   become_method: sudo
 
 - name: run compress for hyperkitty
-  command: django-admin compress --pythonpath /usr/share/webapps/hyperkitty/ --settings settings
+  command: django-admin compress --pythonpath {{ hyperkitty_dir }} --settings settings
   become: yes
   become_user: hyperkitty
   become_method: sudo
 
 # TODO: run only once
 - name: populate the hyperkitty database
-  command: django-admin loaddata --pythonpath /usr/share/webapps/hyperkitty/ --settings settings first_start
+  command: django-admin loaddata --pythonpath {{ hyperkitty_dir }} --settings settings first_start
   become: yes
   become_user: hyperkitty
   become_method: sudo
+
+# TODO: run only once
+- name: populate the hyperkitty database
+  command: django-admin loaddata --pythonpath {{ hyperkitty_dir }} --settings settings first_start
+  become: yes
+  become_user: hyperkitty
+  become_method: sudo
+
+- name: check if hyperkitty admin user exists
+  command: echo "from django.contrib.auth import get_user_model; User = get_user_model(); print(User.objects.filter(username='{{hyperkitty_admin_user}}').count()>0)" | /usr/bin/python ./manage.py shell
+  args:
+    chdir: "{{ hyperkitty_dir }}"
+  become: yes
+  become_user: hyperkitty
+  become_method: sudo
+  register: hyperkitty_superuser_existed
+
+- name: create hyperkitty admin user
+  command: django-admin createsuperuser --pythonpath {{ hyperkitty_dir }} --settings settings --noinput --username={{ hyperkitty_admin_user }} --email={{ hyperkitty_admin_email }}
+  environment:
+    DJANGO_SUPERUSER_PASSWORD: "{{ vault_mailman_hyperkitty_admin_password }}"
+  become: yes
+  become_user: hyperkitty
+  become_method: sudo
+  when: not hyperkitty_superuser_existed
+
 
 - name: start and enable mailman core service
   service: name="mailman3.service" enabled=yes state=started

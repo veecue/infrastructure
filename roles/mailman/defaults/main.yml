@@ -1,2 +1,8 @@
+# Mailman
 mailman_db_user: mailman
+
+# Hyperkitty
+hyperkitty_dir: /usr/share/webapps/hyperkitty
 hyperkitty_db_user: hyperkitty
+hyperkitty_admin_user: hyperkitty
+hyperkitty_admin_email: hyperkitty@archlinux.org
