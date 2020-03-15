@@ -1,5 +1,7 @@
 # Mailman
+mailman_domain: mailman3.archlinux.org # lists.archlinux.org
 mailman_db_user: mailman
+mailman_nginx_conf: /etc/nginx/nginx.d/mailman.conf
 
 # Hyperkitty
 hyperkitty_dir: /usr/share/webapps/hyperkitty

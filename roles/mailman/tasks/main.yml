@@ -29,7 +29,9 @@
   become_user: postgres
   become_method: su
 
-- template: src="hyperkitty.py.j2" dest="/etc/webapps/hyperkitty/settings_local.py" owner=hyperkitty group=root mode=0644
+- file: src=/etc/webapps/hyperkitty/settings_local.py dest=/usr/share/webapps/hyperkitty/settings_local.py owner=root group=hyperkitty state=link
+
+- template: src="hyperkitty.py.j2" dest="/etc/webapps/hyperkitty/settings_local.py" owner=root group=hyperkitty mode=0644
 
 # TODO: only run when required, ie. hyperkitty package updated
 - name: generate a hyperkitty database
@@ -82,6 +84,36 @@
   become_method: sudo
   when: not hyperkitty_superuser_existed
 
+- name: copy uwsgi-secure@.socket service
+  copy: src=uwsgi-secure@.service dest=/etc/systemd/system/uwsgi-secure@.service
+  notify:
+    - daemon reload
+
+- name: copy uwsgi-secure@.socket service
+  copy: src=uwsgi-secure@.socket dest=/etc/systemd/system/uwsgi-secure@.socket
+  notify:
+    - daemon reload
+
+- name: create ssl cert
+  command: certbot certonly --email webmaster@archlinux.org --agree-tos --rsa-key-size 4096 --renew-by-default --webroot -w {{letsencrypt_validation_dir}} -d '{{ mailman_domain }}' creates='/etc/letsencrypt/live/{{ mailman_domain }}/fullchain.pem'
+
+- name: make nginx log dir
+  file: path=/var/log/nginx/{{ mailman_domain }} state=directory owner=root group=root mode=0755
+
+- name: set up nginx
+  template: src=nginx.d.conf.j2 dest="{{ mailman_nginx_conf }}" owner=root group=root mode=644
+  notify:
+    - reload nginx
+  tags: ['nginx']
+
+- name: make nginx log dir
+  file: path=/var/log/nginx/{{ mailman_domain }} state=directory owner=root group=root mode=0755
+
+- name: enable hyperkitty socket
+  service: name="uwsgi-secure@hyperkitty.socket" enabled=yes state=started
+
+- name: enable hyperkitty asynchronous operations service
+  service: name="hyperkitty-qcluster.service" enabled=yes state=started
 
 - name: start and enable mailman core service
   service: name="mailman3.service" enabled=yes state=started

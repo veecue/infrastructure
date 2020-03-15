@@ -10,6 +10,7 @@ ADMINS = (
 ALLOWED_HOSTS = [
 	"localhost",
 	"127.0.0,1",
+	"{{ mailman_domain }}",
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -23,7 +24,7 @@ DATABASES = {
           'ENGINE'  : 'django.db.backends.postgresql_psycopg2',
           'NAME'    : 'hyperkitty',
           'USER'    : '{{ hyperkitty_db_user }}',
-          'PASSWORD': ''{{ vault_postgres_users.hyperkitty }},
+          'PASSWORD': '{{ vault_postgres_users.hyperkitty }}',
           'HOST'    : 'localhost',
           'PORT'    : '',
     }

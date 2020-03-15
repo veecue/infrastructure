@@ -1,0 +1,22 @@
+[Unit]
+Description=uWSGI service unit
+After=syslog.target
+
+[Service]
+ExecStart=/usr/bin/uwsgi --ini /etc/uwsgi/%I.ini
+ExecReload=/bin/kill -HUP $MAINPID
+ExecStop=/bin/kill -INT $MAINPID
+Type=notify
+SuccessExitStatus=15 17 29 30
+StandardError=syslog
+NotifyAccess=all
+KillSignal=SIGQUIT
+PrivateDevices=yes
+PrivateTmp=yes
+ProtectSystem=full
+ReadWriteDirectories=/etc/webapps /var/lib/
+ProtectHome=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=multi-user.target

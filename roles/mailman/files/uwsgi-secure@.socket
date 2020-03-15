@@ -1,0 +1,10 @@
+[Unit]
+Description=Socket for uWSGI %I
+
+[Socket]
+ListenStream=/run/%I/%I.sock
+SocketGroup=http
+SocketMode=0660
+
+[Install]
+WantedBy=sockets.target
