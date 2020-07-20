@@ -100,6 +100,7 @@ aur-dev.archlinux.org
 
 [node_exporters]
 monitoring.archlinux.org
+gitlab.archlinux.org
 reproducible.archlinux.org
 
 [prometheus]
