@@ -97,3 +97,10 @@ repro3.pkgbuild.com
 apollo.archlinux.org
 aur.archlinux.org
 aur-dev.archlinux.org
+
+[node_exporters]
+monitoring.archlinux.org
+reproducible.archlinux.org
+
+[prometheus]
+monitoring.archlinux.org
