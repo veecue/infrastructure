@@ -13,7 +13,8 @@ LockPersonality=true
 PrivateDevices=true
 PrivateTmp=true
 ProtectSystem=strict
-ReadWritePaths={{ prometheus_textfile_dir }}
+ProtectHome=read-only
+ReadWritePaths={{ prometheus_textfile_dir }} /root/.cache/borg
 
 MemoryDenyWriteExecute=true
 RemoveIPC=true
@@ -21,9 +22,14 @@ RestrictRealtime=true
 RestrictNamespaces=true
 RestrictSUIDSGID=true
 
+RestrictAddressFamilies=~AF_PACKET
+RestrictAddressFamilies=~AF_NETLINK
+
 ProtectHostname=true
 ProtectControlGroups=true
 ProtectKernelLogs=true
 ProtectKernelTunables=true
 ProtectKernelModules=true
 ProtectClock=true
+
+SystemCallArchitectures=native
