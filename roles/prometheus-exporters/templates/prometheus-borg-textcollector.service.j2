@@ -1,6 +1,7 @@
 [Unit]
 Description=Prometheus Borg Exporter TextCollector
 After=network.target
+ConditionPathExistsGlob=!/root/.cache/borg/*/lock.roster
 
 [Service]
 Type=oneshot
