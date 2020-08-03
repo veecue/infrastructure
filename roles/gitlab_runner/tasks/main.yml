@@ -43,6 +43,7 @@
 - name: enable prometheus exporter
   lineinfile:
     path: /etc/gitlab-runner/config.toml
+    insertbefore: '^concurrent'
     line: listen_address = ":{{ gitlab_runner_exporter_port }}"
   notify: restart gitlab-runner
 
