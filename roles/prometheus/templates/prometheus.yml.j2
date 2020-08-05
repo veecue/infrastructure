@@ -49,3 +49,11 @@ scrape_configs:
     - targets: ['gitlab.archlinux.org:443']
       labels:
         instance: "gitlab.archlinux.org"
+
+  - job_name: 'mysqld_exporter'
+    scrape_interval: 5s
+    static_configs:
+
+    - targets: ['aur.archlinux.org:9104']
+      labels:
+        instance: "aur.archlinux.org"

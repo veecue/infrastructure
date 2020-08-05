@@ -99,6 +99,7 @@ aur.archlinux.org
 aur-dev.archlinux.org
 
 [node_exporters]
+aur.archlinux.org
 monitoring.archlinux.org
 gitlab.archlinux.org
 reproducible.archlinux.org
