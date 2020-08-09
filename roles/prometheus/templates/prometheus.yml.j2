@@ -1,8 +1,3 @@
-global:
-  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
-  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
-  # scrape_timeout is set to the global default (10s).
-
 # Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
 rule_files:
   - node.rules.yml
@@ -18,7 +13,6 @@ alerting:
 # Here it's Prometheus itself.
 scrape_configs:
   - job_name: 'node_exporter'
-    scrape_interval: 5s
     static_configs:
     {% for host in groups['node_exporters'] %}
 
@@ -29,7 +23,6 @@ scrape_configs:
     {% endfor %}
 
   - job_name: 'gitlab_runner_exporter'
-    scrape_interval: 5s
     static_configs:
     {% for host in groups['gitlab_runners'] %}
 
@@ -40,7 +33,6 @@ scrape_configs:
     {% endfor %}
 
   - job_name: 'gitlab_exporter'
-    scrape_interval: 5s
     scheme: https
     metrics_path: "-/metrics"
     params:
@@ -51,9 +43,27 @@ scrape_configs:
         instance: "gitlab.archlinux.org"
 
   - job_name: 'mysqld_exporter'
-    scrape_interval: 5s
     static_configs:
 
     - targets: ['aur.archlinux.org:9104']
       labels:
         instance: "aur.archlinux.org"
+
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    scrape_interval: 15s
+    params:
+      module: [http_prometheus]
+    static_configs:
+    - targets:
+    {% for target in blackbox_targets %}
+      - {{ target }}
+    {% endfor %}
+
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: 127.0.0.1:9115
