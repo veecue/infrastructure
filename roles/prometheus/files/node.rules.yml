@@ -414,3 +414,11 @@ groups:
     annotations:
       summary: "Rebuilderd queue length is not empty {{ $labels.instance }})"
       description: "Rebuilderd's queue length is now: {{ $value }}"
+  - alert: RebuilderdWorkersOffline
+    expr: rebuilderd_workers  < 4
+    for: 5m
+    labels:
+      severity: warning
+    annotations:
+      summary: "Rebuilderd workers offline {{ $labels.instance }})"
+      description: "Not all rebuilder-workers are online, currently {{ $value }} workers are online"
