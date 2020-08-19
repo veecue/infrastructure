@@ -407,7 +407,7 @@ groups:
       summary: "Rebuilderd queue length is not decreasing {{ $labels.instance }})"
       description: "Rebuilderd's queue length is now: {{ $value }}"
   - alert: RebuilderdQueueNotEmpty
-    expr: rebuilderd_queue_length > 0
+    expr: rebuilderd_queue_length > 2000
     for: 24h
     labels:
       severity: warning
