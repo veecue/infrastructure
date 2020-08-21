@@ -32,6 +32,17 @@ scrape_configs:
 
     {% endfor %}
 
+  - job_name: 'keycloak'
+    scheme: https
+    metrics_path: "/auth/realms/master/metrics"
+    basic_auth:
+       username: "{{ vault_keycloak_nginx_user }}"
+       password: "{{ vault_keycloak_nginx_passwd }}"
+    static_configs:
+    - targets: ['accounts.archlinux.org:443']
+      labels:
+        instance: "accounts.archlinux.org"
+
   - job_name: 'gitlab_exporter'
     scheme: https
     metrics_path: "-/metrics"
