@@ -398,14 +398,6 @@ groups:
 - name: rebuilderd
   interval: 15m
   rules:
-  - alert: RebuilderdQueueLength
-    expr: predict_linear(rebuilderd_queue_length[6h], 6 * 3600) > rebuilderd_queue_length
-    for: 30m
-    labels:
-      severity: warning
-    annotations:
-      summary: "Rebuilderd queue length is not decreasing {{ $labels.instance }})"
-      description: "Rebuilderd's queue length is now: {{ $value }}"
   - alert: RebuilderdQueueNotEmpty
     expr: rebuilderd_queue_length > 2000
     for: 24h
